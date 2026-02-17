@@ -1,19 +1,27 @@
 from google import genai
 import os
 from dotenv import load_dotenv
-
+import streamlit as st
 load_dotenv()
 
-# 2. Retrieve the variable using os.getenv()
 api = os.getenv("MY_SECRET_API_KEY")
 
-api= "AIzaSyBqV0eGY_Q10_As21LxuqU-nZ1daDzAGh4"
+def get(user_input):
+    ai = genai.Client(api_key=api)
 
-ai = genai.Client(api_key=api)
+    response= ai.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=user_input
+    )
+    return response.text
 
-response= ai.models.generate_content(
-    model="gemini-2.5-flash",
-    contents="how to get more likes ?"
-)
+st.title("AI Chat BOt")
 
-print(response.text)
+user_inp=st.chat_input("Ask me anything...")
+
+if user_inp :
+    with st.chat_message("User"):
+        st.markdown(user_inp)
+    with st.chat_message("AI"):
+        with st.spinner("Thinking..."):
+            st.markdown(get(user_inp))
